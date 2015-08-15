@@ -2,7 +2,7 @@
 #include <SD.h>
 #include <SoftwareSerial.h>
 #include <LiquidCrystal.h>
-
+//test
 LiquidCrystal lcd(12, 11, 6, 5, 4, 3);
 
 // Choose two Arduino pins to use for software serial
