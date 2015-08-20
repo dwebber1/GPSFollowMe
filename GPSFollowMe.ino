@@ -99,19 +99,18 @@ void loop() {
     Serial.print(".");
     Serial.println(LonMinRight);
 
-    Serial.println(LonMinLeftDiff);
-    Serial.println(LatMinLeftDiff);
+    Math();
 
-    //Serial.println(gpsString);
-    // Serial.println(testfloat);
+    
+    Serial.println(LatMinRightDiff);
+    Serial.println(LonMinRightDiff);
+    
+
+    
   }
 
-  LonMinRightDiff = abs(MylocationLonMinRight - LonMinRight);
-  LonMinLeftDiff = abs(MylocationLonMinLeft - LonMinLeft);
+  
 
-
-  LatMinRightDiff = abs(MylocationLatMinRight -  LatMinRight);
-  LatMinLeftDiff = abs(MylocationLatMinRight - LatMinRight);
 
 
 
@@ -159,6 +158,15 @@ void loop() {
   lcd.print(LonMinLeft);
   lcd.print(".");
   lcd.print(LonMinRight);
+
+  // lcd.setCursor(0,0);
+  // lcd.print("Lat Diff: ");
+  // lcd.print(LatMinRightDiff);
+  // lcd.setCursor(0,1);
+  // lcd.print("Lon Diff: ");
+  // lcd.print(LonMinRightDiff);
+  // delay(1500);
+  // lcd.clear();
 }
 
 
@@ -170,22 +178,39 @@ void loop() {
 
 
 
-if (MylocationLat == LatDeg && MylocationLong == LonDeg) {
-  //Serial.println("The lat and long are correct");
-  if (LatMinLeftDiff == 0 && LonMinLeftDiff == 0) {
-    //Serial.println("The latMin are the same");
-    if (LonMinRightDiff < 200 && LatMinRightDiff < 200) {
-      digitalWrite(hot, HIGH);
-    }
-    else {
-      digitalWrite(hot, LOW);
+  if (MylocationLat == LatDeg && MylocationLong == LonDeg) {
+    //Serial.println("The lat and long are correct");
+    if (LatMinLeftDiff == 0 && LonMinLeftDiff == 0) {
+      // Serial.println("The Left sides are the same");
+      if (LonMinRightDiff < 500 && LatMinRightDiff < 500) {
+        digitalWrite(hot, HIGH);
+    
+        }
+      else{
+        digitalWrite(hot,LOW);
+        }
+  
+
+  
     }
 
   }
 
-  
 
 
+
+
+}
+
+void Math(){
+ LonMinRightDiff = abs(MylocationLonMinRight - LonMinRight);
+
+ LonMinLeftDiff = abs(MylocationLonMinLeft - LonMinLeft);
+
+
+ LatMinRightDiff = abs(MylocationLatMinRight -  LatMinRight);
+
+ LatMinLeftDiff = abs(MylocationLatMinLeft - LatMinLeft);
 }
 
 
@@ -194,7 +219,7 @@ if (MylocationLat == LatDeg && MylocationLong == LonDeg) {
 
 
 
-}
+
 
 
 
