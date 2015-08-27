@@ -101,9 +101,10 @@ void loop() {
 
     Math();
 
-    
-    Serial.println(LatMinRightDiff);
-    Serial.println(LonMinRightDiff);
+        Serial.print("The Lat Min Right Diff is: ");
+        Serial.println(LatMinRightDiff);
+        Serial.print("The Long Min Right Diff is: ");
+        Serial.println(LonMinRightDiff);
     
 
     
@@ -144,20 +145,20 @@ void loop() {
  else {
 
 
-  lcd.setCursor(0, 0);
-  lcd.print("Lat:");
-  lcd.print(LatDeg);
-  lcd.print(" N ");
-  lcd.print(LatMinLeft);
-  lcd.print(".");
-  lcd.print(LatMinRight);
-  lcd.setCursor(0, 1);
-  lcd.print("Lon:");
-  lcd.print(LonDeg);
-  lcd.print(" W ");
-  lcd.print(LonMinLeft);
-  lcd.print(".");
-  lcd.print(LonMinRight);
+    lcd.setCursor(0, 0);
+    lcd.print("Lat:");
+    lcd.print(LatDeg);
+    lcd.print(" N ");
+    lcd.print(LatMinLeft);
+    lcd.print(".");
+    lcd.print(LatMinRight);
+    lcd.setCursor(0, 1);
+    lcd.print("Lon:");
+    lcd.print(LonDeg);
+    lcd.print(" W ");
+    lcd.print(LonMinLeft);
+    lcd.print(".");
+    lcd.print(LonMinRight);
 
   // lcd.setCursor(0,0);
   // lcd.print("Lat Diff: ");
@@ -182,10 +183,11 @@ void loop() {
     //Serial.println("The lat and long are correct");
     if (LatMinLeftDiff == 0 && LonMinLeftDiff == 0) {
       // Serial.println("The Left sides are the same");
-      if (LonMinRightDiff < 500 && LatMinRightDiff < 500) {
+      if (LonMinRightDiff < 100 && LatMinRightDiff < 100) {
         digitalWrite(hot, HIGH);
     
         }
+      
       else{
         digitalWrite(hot,LOW);
         }
