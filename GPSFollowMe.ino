@@ -17,8 +17,8 @@ int GPSBaud = 4800;
 int LatDeg = 0;
 int LatMinLeft = 0;
 int LatMinRight = 0;
-
-int hot = 13;
+int on = 13;
+int hot = 8;
 
 
 int LonDeg = 0;
@@ -41,6 +41,8 @@ int LatMinRightDiff = 0;
 
 int record = 7;
 
+const int threshold = 50;
+
 
 // Create a software serial port called "gpsSerial"
 // This is how we will communicate with the GPS
@@ -55,7 +57,9 @@ void setup() {
   // Start the software serial port at the GPS's default baud
   gpsSerial.begin(GPSBaud);
   pinMode(hot, OUTPUT);
+  pinMode(on, OUTPUT);
   pinMode(record, INPUT);
+
 
 }
 void loop() {
@@ -67,6 +71,7 @@ void loop() {
     do {
       //Prints the data from the GPS onto the SD card and a Serial Monitor.
       if (gpsSerial.available()) {
+        digitalWrite(on, HIGH);
         c = gpsSerial.read();
         gpsString.concat(String(c));
 
@@ -77,6 +82,8 @@ void loop() {
         LonDeg = gpsString.substring(24, 27).toInt();
         LonMinLeft = gpsString.substring(27, 29).toInt();
         LonMinRight = gpsString.substring(30, 35).toInt();
+        
+        Math();
 
 
 
@@ -99,18 +106,18 @@ void loop() {
     Serial.print(".");
     Serial.println(LonMinRight);
 
-    Math();
 
-        Serial.print("The Lat Min Right Diff is: ");
-        Serial.println(LatMinRightDiff);
-        Serial.print("The Long Min Right Diff is: ");
-        Serial.println(LonMinRightDiff);
-    
 
-    
+    Serial.print("The Lat Min Right Diff is: ");
+    Serial.println(LatMinRightDiff);
+    Serial.print("The Long Min Right Diff is: ");
+    Serial.println(LonMinRightDiff);
+
+
+
   }
 
-  
+
 
 
 
@@ -122,79 +129,34 @@ void loop() {
 
   if (digitalRead(record)) {
 
-   MylocationLat = LatDeg;
-   MylocationLong = LonDeg;
-   MylocationLonMinRight =LonMinRight;
-   MylocationLonMinLeft =LonMinLeft;
-
-
-   MylocationLatMinRight = LatMinRight ;
-   MylocationLatMinLeft = LatMinLeft  ;
-
-
-
-
-   lcd.clear();
-   delay(500);
-   lcd.print("Recorded");
-   lcd.setCursor(0, 1);
-   lcd.print("Location !");
-   delay(2000);
- }
-
- else {
-
-
-    lcd.setCursor(0, 0);
-    lcd.print("Lat:");
-    lcd.print(LatDeg);
-    lcd.print(" N ");
-    lcd.print(LatMinLeft);
-    lcd.print(".");
-    lcd.print(LatMinRight);
-    lcd.setCursor(0, 1);
-    lcd.print("Lon:");
-    lcd.print(LonDeg);
-    lcd.print(" W ");
-    lcd.print(LonMinLeft);
-    lcd.print(".");
-    lcd.print(LonMinRight);
-
-  // lcd.setCursor(0,0);
-  // lcd.print("Lat Diff: ");
-  // lcd.print(LatMinRightDiff);
-  // lcd.setCursor(0,1);
-  // lcd.print("Lon Diff: ");
-  // lcd.print(LonMinRightDiff);
-  // delay(1500);
-  // lcd.clear();
-}
-
-
-
-
-
-
-
-
-
-
-  if (MylocationLat == LatDeg && MylocationLong == LonDeg) {
-    //Serial.println("The lat and long are correct");
-    if (LatMinLeftDiff == 0 && LonMinLeftDiff == 0) {
-      // Serial.println("The Left sides are the same");
-      if (LonMinRightDiff < 100 && LatMinRightDiff < 100) {
-        digitalWrite(hot, HIGH);
+    MylocationLat = LatDeg;
+    MylocationLong = LonDeg;
     
-        }
-      
-      else{
-        digitalWrite(hot,LOW);
-        }
-  
+    MylocationLonMinRight = LonMinRight;
+    MylocationLonMinLeft = LonMinLeft;
 
-  
-    }
+
+    MylocationLatMinRight = LatMinRight ;
+    MylocationLatMinLeft = LatMinLeft;
+
+
+
+
+    lcd.clear();
+    delay(500);
+    lcd.print("Recorded");
+    lcd.setCursor(0, 1);
+    lcd.print("Location !");
+    delay(2000);
+  }
+
+  else {
+    printLocationCheck();
+
+
+
+
+
 
   }
 
@@ -202,17 +164,73 @@ void loop() {
 
 
 
+
+
+
+
+
+
+
 }
 
-void Math(){
- LonMinRightDiff = abs(MylocationLonMinRight - LonMinRight);
+void Math() {
+  LonMinRightDiff = abs(MylocationLonMinRight - LonMinRight);
 
- LonMinLeftDiff = abs(MylocationLonMinLeft - LonMinLeft);
+  LonMinLeftDiff = abs(MylocationLonMinLeft - LonMinLeft);
 
 
- LatMinRightDiff = abs(MylocationLatMinRight -  LatMinRight);
+  LatMinRightDiff = abs(MylocationLatMinRight -  LatMinRight);
 
- LatMinLeftDiff = abs(MylocationLatMinLeft - LatMinLeft);
+  LatMinLeftDiff = abs(MylocationLatMinLeft - LatMinLeft);
+}
+
+void printLocationCheck() {
+
+
+
+  if (MylocationLat == LatDeg && MylocationLong == LonDeg) {
+    //Serial.println("The lat and long are correct");
+    if (LatMinLeftDiff == 0 && LonMinLeftDiff == 0) {
+      // Serial.println("The Left sides are the same");
+      if (LonMinRightDiff < threshold && LatMinRightDiff < threshold) {
+        lcd.setCursor(0, 0);
+        digitalWrite(hot, HIGH);
+        lcd.clear();
+
+
+        lcd.print("You have found");
+        lcd.setCursor(0, 1);
+        lcd.print("the location !");
+        delay(200);
+
+
+
+      }
+
+      else {
+        digitalWrite(hot, LOW);
+        lcd.setCursor(0, 0);
+        lcd.print("Lat:");
+        lcd.print(LatDeg);
+        lcd.print(" N ");
+        lcd.print(LatMinLeft);
+        lcd.print(".");
+        lcd.print(LatMinRight);
+        lcd.setCursor(0, 1);
+        lcd.print("Lon:");
+        lcd.print(LonDeg);
+        lcd.print(" W ");
+        lcd.print(LonMinLeft);
+        lcd.print(".");
+        lcd.print(LonMinRight);
+
+      }
+
+
+
+    }
+
+  }
 }
 
 
