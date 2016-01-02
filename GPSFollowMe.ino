@@ -64,174 +64,129 @@ void setup() {
 }
 void loop() {
 
-  if (gpsSerial.available() >= 6 && gpsSerial.read() == '$' && gpsSerial.read() == 'G' && gpsSerial.read() == 'P' && gpsSerial.read() == 'G' && gpsSerial.read() == 'G' && gpsSerial.read() == 'A') {
-    String gpsString = "";
-    char c = 0;
+	if (gpsSerial.available() >= 6 && gpsSerial.read() == '$' && gpsSerial.read() == 'G' && gpsSerial.read() == 'P' && gpsSerial.read() == 'G' && gpsSerial.read() == 'G' && gpsSerial.read() == 'A') {
+		String gpsString = "";
+		char c = 0;
 
-    do {
+		do {
       //Prints the data from the GPS onto the SD card and a Serial Monitor.
       if (gpsSerial.available()) {
-        digitalWrite(on, HIGH);
-        c = gpsSerial.read();
-        gpsString.concat(String(c));
+      	digitalWrite(on, HIGH);
+      	c = gpsSerial.read();
+      	gpsString.concat(String(c));
 
-        LatDeg = gpsString.substring(12, 14).toInt();
-        LatMinLeft = gpsString.substring(14, 16).toInt();
-        LatMinRight = gpsString.substring(17, 21).toInt();
+      	LatDeg = gpsString.substring(12, 14).toInt();
+      	LatMinLeft = gpsString.substring(14, 16).toInt();
+      	LatMinRight = gpsString.substring(17, 21).toInt();
 
-        LonDeg = gpsString.substring(24, 27).toInt();
-        LonMinLeft = gpsString.substring(27, 29).toInt();
-        LonMinRight = gpsString.substring(30, 35).toInt();
-        
-        Math();
+      	LonDeg = gpsString.substring(24, 27).toInt();
+      	LonMinLeft = gpsString.substring(27, 29).toInt();
+      	LonMinRight = gpsString.substring(30, 35).toInt();
 
-
-
+      	Math();
       }
-    }
-
-    while (c != '\n');
-
-    Serial.print("The lat Degree  is ");
-    Serial.println(LatDeg);
-    Serial.print("The lat min is ");
-    Serial.print(LatMinLeft);
-    Serial.print(".");
-    Serial.println(LatMinRight);
-
-    Serial.print("The long degree is ");
-    Serial.println(LonDeg);
-    Serial.print("The long min is ");
-    Serial.print(LonMinLeft);
-    Serial.print(".");
-    Serial.println(LonMinRight);
-
-
-
-    Serial.print("The Lat Min Right Diff is: ");
-    Serial.println(LatMinRightDiff);
-    Serial.print("The Long Min Right Diff is: ");
-    Serial.println(LonMinRightDiff);
-
-
-
   }
 
+  while (c != '\n');
+
+  Serial.print("The lat Degree  is ");
+  Serial.println(LatDeg);
+  Serial.print("The lat min is ");
+  Serial.print(LatMinLeft);
+  Serial.print(".");
+  Serial.println(LatMinRight);
+
+  Serial.print("The long degree is ");
+  Serial.println(LonDeg);
+  Serial.print("The long min is ");
+  Serial.print(LonMinLeft);
+  Serial.print(".");
+  Serial.println(LonMinRight);
+
+  Serial.print("The Lat Min Right Diff is: ");
+  Serial.println(LatMinRightDiff);
+  Serial.print("The Long Min Right Diff is: ");
+  Serial.println(LonMinRightDiff);
+
+
+
+}
+
+if (digitalRead(record)) {
+
+	MylocationLat = LatDeg;
+	MylocationLong = LonDeg;
+
+	MylocationLonMinRight = LonMinRight;
+	MylocationLonMinLeft = LonMinLeft;
+
+
+	MylocationLatMinRight = LatMinRight ;
+	MylocationLatMinLeft = LatMinLeft;
 
 
 
 
+	lcd.clear();
+	delay(500);
+	lcd.print("Recorded");
+	lcd.setCursor(0, 1);
+	lcd.print("Location !");
+	delay(2000);
+}
 
-
-
-
-
-
-  if (digitalRead(record)) {
-
-    MylocationLat = LatDeg;
-    MylocationLong = LonDeg;
-    
-    MylocationLonMinRight = LonMinRight;
-    MylocationLonMinLeft = LonMinLeft;
-
-
-    MylocationLatMinRight = LatMinRight ;
-    MylocationLatMinLeft = LatMinLeft;
-
-
-
-
-    lcd.clear();
-    delay(500);
-    lcd.print("Recorded");
-    lcd.setCursor(0, 1);
-    lcd.print("Location !");
-    delay(2000);
-  }
-
-  else {
-    printLocationCheck();
-
-
-
-
-
-
-  }
-
-
-
-
-
-
-
-
-
-
-
-
+else {
+	printLocationCheck();
+}
 }
 
 void Math() {
-  LonMinRightDiff = abs(MylocationLonMinRight - LonMinRight);
+	LonMinRightDiff = abs(MylocationLonMinRight - LonMinRight);
 
-  LonMinLeftDiff = abs(MylocationLonMinLeft - LonMinLeft);
+	LonMinLeftDiff = abs(MylocationLonMinLeft - LonMinLeft);
 
 
-  LatMinRightDiff = abs(MylocationLatMinRight -  LatMinRight);
+	LatMinRightDiff = abs(MylocationLatMinRight -  LatMinRight);
 
-  LatMinLeftDiff = abs(MylocationLatMinLeft - LatMinLeft);
+	LatMinLeftDiff = abs(MylocationLatMinLeft - LatMinLeft);
 }
 
 void printLocationCheck() {
+	if (MylocationLat == LatDeg && MylocationLong == LonDeg) {
+    	//Serial.println("The lat and long are correct");
+    	if (LatMinLeftDiff == 0 && LonMinLeftDiff == 0) {
+      		// Serial.println("The Left sides are the same");
+      		if (LonMinRightDiff < threshold && LatMinRightDiff < threshold) {
+      			lcd.setCursor(0, 0);
+      			digitalWrite(hot, HIGH);
+      			lcd.clear();
 
+      			lcd.print("You have found");
+      			lcd.setCursor(0, 1);
+      			lcd.print("the location !");
+      			delay(200);
+      		}
 
-
-  if (MylocationLat == LatDeg && MylocationLong == LonDeg) {
-    //Serial.println("The lat and long are correct");
-    if (LatMinLeftDiff == 0 && LonMinLeftDiff == 0) {
-      // Serial.println("The Left sides are the same");
-      if (LonMinRightDiff < threshold && LatMinRightDiff < threshold) {
-        lcd.setCursor(0, 0);
-        digitalWrite(hot, HIGH);
-        lcd.clear();
-
-
-        lcd.print("You have found");
-        lcd.setCursor(0, 1);
-        lcd.print("the location !");
-        delay(200);
-
-
-
+      		else {
+      			digitalWrite(hot, LOW);
+      			lcd.setCursor(0, 0);
+      			lcd.print("Lat:");
+      			lcd.print(LatDeg);
+      			lcd.print(" N ");
+      			lcd.print(LatMinLeft);
+      			lcd.print(".");
+      			lcd.print(LatMinRight);
+      			lcd.setCursor(0, 1);
+      			lcd.print("Lon:");
+      			lcd.print(LonDeg);
+      			lcd.print(" W ");
+      			lcd.print(LonMinLeft);
+      			lcd.print(".");
+      			lcd.print(LonMinRight);
+      		}
+      	}
       }
-
-      else {
-        digitalWrite(hot, LOW);
-        lcd.setCursor(0, 0);
-        lcd.print("Lat:");
-        lcd.print(LatDeg);
-        lcd.print(" N ");
-        lcd.print(LatMinLeft);
-        lcd.print(".");
-        lcd.print(LatMinRight);
-        lcd.setCursor(0, 1);
-        lcd.print("Lon:");
-        lcd.print(LonDeg);
-        lcd.print(" W ");
-        lcd.print(LonMinLeft);
-        lcd.print(".");
-        lcd.print(LonMinRight);
-
-      }
-
-
-
-    }
-
   }
-}
 
 
 
